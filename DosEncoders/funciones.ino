@@ -20,9 +20,9 @@ void parar(double correr)
   pa_alante=0;
   pa_atras=0;
   Serial.println("PARAR");
-  /*if(estado==1&&distI==vueltasqueremosI&&distD==vueltasqueremosD){
+  if(estado==1&&distI==vueltasqueremosI&&distD==vueltasqueremosD){
     estado=2;
-  }*/
+  }
     
   //PARADA
   digitalWrite (IN3, LOW);
@@ -33,45 +33,75 @@ void parar(double correr)
   analogWrite(ENA,correr);
 }
 
-void adelante(double correrI,double correrD)
+void adelante(double correr)
 {pa_alante=1;
 pa_atras=0;
 Serial.println("DELANTE");
   mover_adelante();
-  velocidad(correrD,correrI);
+  velocidad(correr);
 }
 
-void atras(double correrI,double correrD)
+void atras(double correr)
 {
   pa_alante=0;
   pa_atras=1;
   Serial.println("ATRAS");
   mover_atras();  
-  velocidad(correrD,correrI);
+  velocidad(correr);
 }
 
-void girar_izquierda()
+void girar_izquierda_atras(int vel)
+{pa_alante=0;
+  pa_atras=1;
+  //Preparamos la salida para que el motor gire hacia delante
+  digitalWrite (IN3, LOW);
+  digitalWrite (IN4, HIGH);
+  digitalWrite (IN1, LOW);
+  digitalWrite (IN2, HIGH);
+  analogWrite(ENA,vel);
+  analogWrite(ENB,0); //PORQUE SOLO GIRAMOS IZQUIERDA
+}
+
+void girar_izquierda_adelante(int vel)
 {
+  pa_alante=1;
+pa_atras=0;
   //Preparamos la salida para que el motor gire hacia delante
   digitalWrite (IN3, HIGH);
   digitalWrite (IN4, LOW);
-  digitalWrite (IN1, LOW);
+  digitalWrite (IN1, HIGH);
   digitalWrite (IN2, LOW);
+  analogWrite(ENA,vel);
+  analogWrite(ENB,0);
 }
 
-void girar_derecha()
-{
-  //Preparamos la salida para que el motor gire hacia detras
+void girar_derecha_atras(int vel)
+{pa_alante=0;
+  pa_atras=1;
+  //Preparamos la salida para que el motor gire hacia delante
   digitalWrite (IN3, LOW);
+  digitalWrite (IN4, HIGH);
+  digitalWrite (IN1, LOW);
+  digitalWrite (IN2, HIGH);
+  analogWrite(ENA,0);
+  analogWrite(ENB,vel);
+}
+void girar_derecha_adelante(int vel)
+{
+  pa_alante=1;
+pa_atras=0;
+  //Preparamos la salida para que el motor gire hacia delante
+  digitalWrite (IN3, HIGH);
   digitalWrite (IN4, LOW);
   digitalWrite (IN1, HIGH);
-  digitalWrite (IN2, LOW); 
+  digitalWrite (IN2, LOW);
+  analogWrite(ENA,0);
+  analogWrite(ENB,vel);
 }
-
-void velocidad(int velD,int velI)
-{
-  analogWrite(ENB,velD);
-  analogWrite(ENA,velI);
+void velocidad(int vel)
+{analogWrite(ENA,vel);
+  analogWrite(ENB,vel);
+  
 }
 
 
@@ -194,60 +224,55 @@ void control(int vueltasqueremosI, int vueltasqueremosD)
   intI =int(Kp*(errorposicionI+ Td*errorvelocidadI));
   Serial.print("Intensidad Izquierda: ");
   Serial.println(intI);
+  Serial.print("Estado: ");
+  Serial.println(estado);
   /* CALCULOS PARA DERECHA*/
   errorposicionD=vueltasqueremosD-distD;
   errorvelocidadD=errorposicionD/dif_tiempo;
   intD =int(Kp*(errorposicionD+ Td*errorvelocidadD));
   Serial.print("Intensidad Derecha: ");
   Serial.println(intD);
-  if (intI>30&&intD>30){
-    adelante(intI,intD);
-    Serial.print("PRIMERO ");
+if (girar==0){
+  if (intI>30){
+    adelante(intI);
   }
-  else if(intI<-15&&intD<-15)
-  {Serial.print("SEGUNDO ");
-    atras(-intI,-intD);
-  }
-  else if(intI>30&&intD<30&&intD>-15)
-  {adelante(intI,0);
-  Serial.print("TERCERO ");
-  }
-  else if(intI<30&&intI>-15&&intD<-15)
-  {atras(0,-intD);
-  Serial.print("CUARTO ");
-  }
-  else if(intI<-15&&intD<30&&intD>-15)
-  {atras(-intI,0);
-  Serial.print("QUINTO ");
-  }
-  else if(intI<30&&intI>-15&&intD>30)
-  {atras(0,-intD);
-  Serial.print("SEXTO ");
-  }
-  else if(intI>30&&intD<-15)
-  { atras(0,-intD);
-  delay(50);
-    adelante(intI,0);
-    delay(50);
-    
-    
-    Serial.print("SEPTIMO ");
-  }
-  else if(intI<-15&&intD>30)
+  else if(intI<-15)
   {
-    atras(-intI,0);
-    delay(50);
-  adelante(0,intD);
-  delay(50);
-  Serial.print("OCTAVO ");
+    atras(-intI);
   }
-  
-  else if(intI>-15&&intI<30&&intD>-15&&intD<30)
-  {
+  else{
     parar(0);
-    Serial.print("NOVENO ");
+  }
+}
+else if(girar==1) //izquierda
+{
+  if (intI>30){
+    girar_izquierda_adelante(intI);
+  }
+  else if(intI<-15)
+  {
+    girar_izquierda_atras(-intI);
+  }
+  else{
+    parar(0);
   }
   
+}
+else if(girar==2) //derecha
+{
+  if (intD>30){
+    girar_derecha_adelante(intI);
+  }
+  else if(intD<-15)
+  {
+    girar_derecha_atras(-intD);
+  }
+  else{
+    parar(0);
+  }
+  
+  
+}
   delay(10);
   tiempo_a=tiempo; 
 }

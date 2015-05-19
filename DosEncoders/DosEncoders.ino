@@ -23,9 +23,10 @@ unsigned long t_actualizado2 = 0;
 boolean avance=1;
 boolean colision=0;
 boolean marcha=0;
+int girar=0; // 1 Si izquierda 2 si derecha
 int dis1,dis2,dis3,dis4,dis5;
-int dif_tiempo=0,tiempo_a=0;
-int vueltasqueremosI=0,vueltasqueremosD=0,pa_atras=0,pa_alante=0;
+int dif_tiempo=0,tiempo_a=50;
+int vueltasqueremosI=0,vueltasqueremosD=0,pa_atras=0,pa_alante=0,vueltashayI=0,vueltashayD=0;
 
 /* Definimos cada ultrasonido*/
 
@@ -52,17 +53,28 @@ void loop() {
   Serial.println(distD);
   
   switch(estado){
-    case 1:
+    case 0:
     delay(100);
     vueltasqueremosD=3;
     vueltasqueremosI=3;
     control(vueltasqueremosD, vueltasqueremosI);
   break;
-    case 2:
+    case 1:
     delay(100);
+    
+    vueltasqueremosI=24;
     vueltasqueremosD=0;
-    vueltasqueremosI=0;
-   control(vueltasqueremosD, vueltasqueremosI);
+    girar=1;//Izquierda
+    control(vueltasqueremosI, vueltasqueremosD);
+   break;
+   
+   case 2:
+    delay(100);
+    
+    vueltasqueremosI=22;
+    vueltasqueremosD=3;
+    girar=2;//Izquierda
+    control(vueltasqueremosI, vueltasqueremosD);
    break;
    }
 }
