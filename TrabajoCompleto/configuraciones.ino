@@ -2,12 +2,12 @@ void configInterrupciones()
 {
   pinMode(OUT1, INPUT);
   pinMode(OUT2, INPUT);
-  // ActivaciÃ³n de la resistencia interna pull-up
+  // Activación de la resistencia interna pull-up
   digitalWrite (OUT1, HIGH );
   digitalWrite (OUT2, HIGH );
-  // La interrupciÃ³n  0 monitorea los cambios de estado del pin 2.
+  // La interrupción  0 monitorea los cambios de estado del pin 2.
   attachInterrupt(0, inter0, RISING);//CHANGE);
-  // La interrupciÃ³n  1 monitorea los cambios de estado del pin 3.
+  // La interrupción  1 monitorea los cambios de estado del pin 3.
   attachInterrupt(1, inter1, RISING);//CHANGE);
   
   /*MsTimer2::set(tsensores, sensores);
@@ -25,4 +25,3 @@ void configMotores()
    pinMode (IN1, OUTPUT);
    pinMode (IN2, OUTPUT);
 }
-  

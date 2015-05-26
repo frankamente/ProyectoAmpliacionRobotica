@@ -9,17 +9,23 @@ volatile int etat3 = HIGH ;
 // Contadores de distancia de ruedas por encoder
 int distD=0;
 int distI=0;
+int I =0;
+int estado=1;
+int errorposicion=0, errorvelocidad=0;
 
 unsigned long tiempo = 0;
 unsigned long t_actualizado = 0;
 unsigned long t_actualizado1 = 0;
 unsigned long t_actualizado2 = 0;
 
+
 // Control
 boolean avance=1;
 boolean colision=0;
 boolean marcha=0;
 int dis1,dis2,dis3,dis4,dis5;
+int dif_tiempo=0,tiempo_a=0;
+int vueltasqueremos=0,pa_atras=0,pa_alante=0;
 
 /* Definimos cada ultrasonido*/
 
@@ -35,35 +41,25 @@ void setup() {
 
   configInterrupciones();
   configMotores();
+ }
  
-}
-
 void loop() {
+  
   tiempo = millis();
+  Serial.println(distI);
   
-  mover_adelante();
- 
-   if (distD==0 && marcha)
-  {
-    velocidad(0);
-    t_actualizado = tiempo;
-    marcha=0;
-  }
-  if (tiempo > (t_actualizado1 + tmotoreson) && !colision)
-  {
-    velocidad(80);
-    t_actualizado1 = tiempo;
-  }
-  
-  if(distD>0){
-    marcha=1;
-  }
-  // Apagamos el motor y esperamos 5 seg
- if (tiempo > (t_actualizado2 + tsensores))
-  {
-   leer_sensores();
-    t_actualizado2 = tiempo;
-  }
+  switch(estado){
+    case 1:
+    vueltasqueremos=3;
+    control(vueltasqueremos);
+    delay(100);
+  break;
+    case 2:
+    vueltasqueremos=0;
+   control(vueltasqueremos);
+   delay(100);
+   break;
+   }
 }
 
 
